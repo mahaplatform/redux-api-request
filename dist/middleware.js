@@ -1,0 +1,91 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _qs = require('qs');
+
+var _qs2 = _interopRequireDefault(_qs);
+
+var _action_types = require('./action_types');
+
+var actionTypes = _interopRequireWildcard(_action_types);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = function (rest) {
+  return function (store) {
+    return function (next) {
+      return function (action) {
+        var _action$type$match = action.type.match(/([\a-z0-9_\.]*)?\/?([A-Z0-9_]*)/),
+            _action$type$match2 = _slicedToArray(_action$type$match, 3),
+            string = _action$type$match2[0],
+            namespace = _action$type$match2[1],
+            type = _action$type$match2[2];
+
+        if (type !== actionTypes.API_REQUEST) {
+          return next(action);
+        }
+
+        var headers = _extends({
+          'Content-Type': 'application/json'
+        }, action.headers ? action.headers : {});
+
+        var method = action.method;
+
+        var path = action.params && method === 'GET' ? action.endpoint + '?' + _qs2.default.stringify(action.params) : action.endpoint;
+
+        var entity = action.params && method !== 'GET' ? action.params : null;
+
+        var request = _lodash2.default.omitBy({ headers: headers, method: method, path: path, entity: entity }, _lodash2.default.isNil);
+
+        coerceArray(action.request).map(function (requestAction) {
+          store.dispatch({
+            type: namespace + '/' + requestAction,
+            cid: action.cid,
+            request: request
+          });
+        });
+
+        var success = function success(json) {
+
+          coerceArray(action.success).map(function (successAction) {
+            store.dispatch(_extends({
+              type: namespace + '/' + successAction,
+              cid: action.cid
+            }, action.meta, json));
+          });
+        };
+
+        var failure = function failure(response) {
+
+          coerceArray(action.failure).map(function (failureAction) {
+            store.dispatch(_extends({
+              type: namespace + '/' + failureAction,
+              cid: action.cid
+            }, action.meta, response.entity));
+          });
+        };
+
+        return rest({ headers: headers, method: method, path: path, entity: entity }).then(function (response) {
+          return response.entity;
+        }).then(success, failure);
+      };
+    };
+  };
+};
+
+var coerceArray = function coerceArray(value) {
+  return value ? !_lodash2.default.isArray(value) ? [value] : value : [];
+};
