@@ -44,66 +44,69 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var client = _rest2.default.wrap(_params2.default).wrap(_mime2.default).wrap(_defaultRequest2.default).wrap(_errorCode2.default);
+var defaultClient = _rest2.default.wrap(_params2.default).wrap(_mime2.default).wrap(_defaultRequest2.default).wrap(_errorCode2.default);
 
-exports.default = function (store) {
-  return function (next) {
-    return function (action) {
-      var _action$type$match = action.type.match(/([\a-z0-9_\.]*)?\/?([A-Z0-9_]*)/),
-          _action$type$match2 = _slicedToArray(_action$type$match, 3),
-          string = _action$type$match2[0],
-          namespace = _action$type$match2[1],
-          type = _action$type$match2[2];
+exports.default = function () {
+  var client = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultClient;
+  return function (store) {
+    return function (next) {
+      return function (action) {
+        var _action$type$match = action.type.match(/([\a-z0-9_\.]*)?\/?([A-Z0-9_]*)/),
+            _action$type$match2 = _slicedToArray(_action$type$match, 3),
+            string = _action$type$match2[0],
+            namespace = _action$type$match2[1],
+            type = _action$type$match2[2];
 
-      if (type !== actionTypes.API_REQUEST) {
-        return next(action);
-      }
+        if (type !== actionTypes.API_REQUEST) {
+          return next(action);
+        }
 
-      var headers = _extends({
-        'Content-Type': 'application/json'
-      }, action.headers ? action.headers : {});
+        var headers = _extends({
+          'Content-Type': 'application/json'
+        }, action.headers ? action.headers : {});
 
-      var method = action.method;
+        var method = action.method;
 
-      var path = action.query && method === 'GET' ? action.endpoint + '?' + _qs2.default.stringify(action.query) : action.endpoint;
+        var path = action.query && method === 'GET' ? action.endpoint + '?' + _qs2.default.stringify(action.query) : action.endpoint;
 
-      var entity = action.body && method !== 'GET' ? action.body : null;
+        var entity = action.body && method !== 'GET' ? action.body : null;
 
-      var request = _lodash2.default.omitBy({ headers: headers, method: method, path: path, entity: entity }, _lodash2.default.isNil);
+        var request = _lodash2.default.omitBy({ headers: headers, method: method, path: path, entity: entity }, _lodash2.default.isNil);
 
-      coerceArray(action.request).map(function (requestAction) {
-        store.dispatch(_extends({
-          type: withNamespace(namespace, requestAction)
-        }, action.meta, {
-          request: request
-        }));
-      });
-
-      var success = function success(json) {
-
-        coerceArray(action.success).map(function (successAction) {
+        coerceArray(action.request).map(function (requestAction) {
           store.dispatch(_extends({
-            type: withNamespace(namespace, successAction)
+            type: withNamespace(namespace, requestAction)
           }, action.meta, {
-            result: json
+            request: request
           }));
         });
+
+        var success = function success(json) {
+
+          coerceArray(action.success).map(function (successAction) {
+            store.dispatch(_extends({
+              type: withNamespace(namespace, successAction)
+            }, action.meta, {
+              result: json
+            }));
+          });
+        };
+
+        var failure = function failure(response) {
+
+          coerceArray(action.failure).map(function (failureAction) {
+            store.dispatch(_extends({
+              type: withNamespace(namespace, failureAction)
+            }, action.meta, {
+              result: response.entity
+            }));
+          });
+        };
+
+        return client({ headers: headers, method: method, path: path, entity: entity }).then(function (response) {
+          return response.entity;
+        }).then(success, failure);
       };
-
-      var failure = function failure(response) {
-
-        coerceArray(action.failure).map(function (failureAction) {
-          store.dispatch(_extends({
-            type: withNamespace(namespace, failureAction)
-          }, action.meta, {
-            result: response.entity
-          }));
-        });
-      };
-
-      return client({ headers: headers, method: method, path: path, entity: entity }).then(function (response) {
-        return response.entity;
-      }).then(success, failure);
     };
   };
 };

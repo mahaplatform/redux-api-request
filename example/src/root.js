@@ -5,7 +5,7 @@ import createApiRequest from 'redux-api-request'
 import thunkMiddleware from 'redux-thunk'
 import { createLogger } from 'redux-logger'
 
-import reducer from './fetcher/reducer'
+import reducer from './reducer'
 
 class Root extends React.Component {
 
@@ -28,15 +28,11 @@ class Root extends React.Component {
   }
 
   render() {
-
-    const { children } = this.props
-
     return (
       <Provider store={ this.store }>
-        { children }
+        { this.props.children }
       </Provider>
     )
-
   }
 
 }

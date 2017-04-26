@@ -4,7 +4,7 @@
   "description": "redux-api-request example",
   "main": "./dist/server.js",
   "scripts": {
-    "build": "webpack",
+    "build": "rm -rf dist && webpack",
     "start": "node ./src/server.js"
   },
   "author": "",
