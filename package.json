@@ -11,7 +11,14 @@
     "type": "git",
     "url": "git+https://github.com/thinktopography/redux-api-request.git"
   },
-  "author": "",
+  "author": "Greg Kops <greg@thinktopography.com>",
+  "maintainers": [
+    {
+      "name": "Greg Kops",
+      "email": "greg@thinktopography.com"
+    }
+  ],
+  "keywords": ["react","redux","rest","api","async","fetch","get","post","put","patch","delete"],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/thinktopography/redux-api-request/issues"
