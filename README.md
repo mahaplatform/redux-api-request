@@ -23,9 +23,11 @@ npm install --save redux-api-request
 Using redux-api-request in your application is easy:
 
 ```javascript
+import { API_REQUEST } from 'redux-api-request/action_types'
+
 # action creator
 export const signin = (email, password) => ({
-  type: 'API_REQUEST',
+  type: API_REQUEST,
   method: 'POST',
   endpoint: '/admin/signin',
   params: { email, password },
