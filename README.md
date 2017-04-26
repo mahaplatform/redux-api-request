@@ -31,8 +31,8 @@ export const signin = (email, password) => ({
   method: 'POST',
   endpoint: '/admin/signin',
   params: { email, password },
-  request: actionTypes.SIGNIN_REQUEST,
-  success: actionTypes.SIGNIN_SUCCESS,
-  failure: actionTypes.SIGNIN_FAILURE
+  request: SIGNIN_REQUEST,
+  success: SIGNIN_SUCCESS,
+  failure: SIGNIN_FAILURE
 })
 ```
