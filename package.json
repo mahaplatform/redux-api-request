@@ -1,6 +1,6 @@
 {
   "name": "redux-api-request",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Redux middleware for making api requests",
   "main": "dist/index.js",
   "scripts": {
@@ -18,7 +18,19 @@
       "email": "greg@thinktopography.com"
     }
   ],
-  "keywords": ["react","redux","rest","api","async","fetch","get","post","put","patch","delete"],
+  "keywords": [
+    "react",
+    "redux",
+    "rest",
+    "api",
+    "async",
+    "fetch",
+    "get",
+    "post",
+    "put",
+    "patch",
+    "delete"
+  ],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/thinktopography/redux-api-request/issues"
@@ -41,8 +53,6 @@
   },
   "peerDependencies": {
     "react": "^15.5.4",
-    "react-redux": "^5.0.4",
-    "redux": "^3.6.0",
-    "redux-thunk": "^2.2.0"
+    "redux": "^3.6.0"
   }
 }
