@@ -1,8 +1,15 @@
 import _ from 'lodash'
 import qs from 'qs'
+import rest from 'rest'
+import params from 'rest/interceptor/params'
+import mime from 'rest/interceptor/mime'
+import defaultRequest from 'rest/interceptor/defaultRequest'
+import errorCode from 'rest/interceptor/errorCode'
 import * as actionTypes from './action_types'
 
-export default rest => store => next => action => {
+const client =  rest.wrap(params).wrap(mime).wrap(defaultRequest).wrap(errorCode)
+
+export default store => next => action => {
 
   const [string, namespace, type] = action.type.match(/([\a-z0-9_\.]*)?\/?([A-Z0-9_]*)/)
 
@@ -26,7 +33,7 @@ export default rest => store => next => action => {
   coerceArray(action.request).map(requestAction => {
     store.dispatch({
       type: withNamespace(namespace, requestAction),
-      cid: action.cid,
+      ...action.meta,
       request
     })
   })
@@ -37,7 +44,6 @@ export default rest => store => next => action => {
     coerceArray(action.success).map(successAction => {
       store.dispatch({
         type: withNamespace(namespace, successAction),
-        cid: action.cid,
         ...action.meta,
         result: json
       })
@@ -50,7 +56,6 @@ export default rest => store => next => action => {
     coerceArray(action.failure).map(failureAction => {
       store.dispatch({
         type: withNamespace(namespace, failureAction),
-        cid: action.cid,
         ...action.meta,
         result: response.entity
       })
@@ -58,7 +63,7 @@ export default rest => store => next => action => {
 
   }
 
-  return rest({ headers, method, path, entity }).then(response => response.entity).then(success, failure)
+  return client({ headers, method, path, entity }).then(response => response.entity).then(success, failure)
 
 }
 

@@ -84,8 +84,7 @@ var dispatchSingleAction = function dispatchSingleAction(type, done) {
   var next = function next() {};
 
   var action = _defineProperty({
-    type: 'API_REQUEST',
-    namespace: 'foo',
+    type: 'foo/API_REQUEST',
     endpoint: '/' + type
   }, type, 'FETCH_' + type.toUpperCase());
 
@@ -105,8 +104,7 @@ var dispatchMultipleActions = function dispatchMultipleActions(type, done) {
   var next = function next() {};
 
   var action = {
-    type: 'API_REQUEST',
-    namespace: 'foo',
+    type: 'foo/API_REQUEST',
     endpoint: '/' + type,
     request: ['FETCH_${type.toUpperCase()}1', 'FETCH_${type.toUpperCase()}2']
   };
