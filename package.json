@@ -1,6 +1,6 @@
 {
   "name": "redux-api-request",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Redux middleware for making api requests",
   "main": "dist/index.js",
   "scripts": {

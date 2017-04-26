@@ -9,61 +9,65 @@ import * as actionTypes from './action_types'
 
 const defaultClient = rest.wrap(params).wrap(mime).wrap(defaultRequest).wrap(errorCode)
 
-export default (client = defaultClient) => store => next => action => {
+export default (client = defaultClient) => {
 
-  const [string, namespace, type] = action.type.match(/([\a-z0-9_\.]*)?\/?([A-Z0-9_]*)/)
+  return store => next => action => {
 
-  if(type !== actionTypes.API_REQUEST) {
-    return next(action)
-  }
+    const [string, namespace, type] = action.type.match(/([\a-z0-9_\.]*)?\/?([A-Z0-9_]*)/)
 
-  const headers = {
-    'Content-Type': 'application/json',
-    ...action.headers ? action.headers : {}
-  }
+    if(type !== actionTypes.API_REQUEST) {
+      return next(action)
+    }
 
-  const method = action.method
+    const headers = {
+      'Content-Type': 'application/json',
+      ...action.headers ? action.headers : {}
+    }
 
-  const path = (action.query && method === 'GET') ? `${action.endpoint}?${qs.stringify(action.query)}` : action.endpoint
+    const method = action.method
 
-  const entity = (action.body && method !== 'GET') ? action.body : null
+    const path = (action.query && method === 'GET') ? `${action.endpoint}?${qs.stringify(action.query)}` : action.endpoint
 
-  const request = _.omitBy({ headers, method, path, entity }, _.isNil)
+    const entity = (action.body && method !== 'GET') ? action.body : null
 
-  coerceArray(action.request).map(requestAction => {
-    store.dispatch({
-      type: withNamespace(namespace, requestAction),
-      ...action.meta,
-      request
-    })
-  })
+    const request = _.omitBy({ headers, method, path, entity }, _.isNil)
 
-
-  const success = (json) => {
-
-    coerceArray(action.success).map(successAction => {
+    coerceArray(action.request).map(requestAction => {
       store.dispatch({
-        type: withNamespace(namespace, successAction),
+        type: withNamespace(namespace, requestAction),
         ...action.meta,
-        result: json
+        request
       })
     })
 
-  }
 
-  const failure = (response) => {
+    const success = (json) => {
 
-    coerceArray(action.failure).map(failureAction => {
-      store.dispatch({
-        type: withNamespace(namespace, failureAction),
-        ...action.meta,
-        result: response.entity
+      coerceArray(action.success).map(successAction => {
+        store.dispatch({
+          type: withNamespace(namespace, successAction),
+          ...action.meta,
+          result: json
+        })
       })
-    })
+
+    }
+
+    const failure = (response) => {
+
+      coerceArray(action.failure).map(failureAction => {
+        store.dispatch({
+          type: withNamespace(namespace, failureAction),
+          ...action.meta,
+          result: response.entity
+        })
+      })
+
+    }
+
+    return client({ headers, method, path, entity }).then(response => response.entity).then(success, failure)
 
   }
-
-  return client({ headers, method, path, entity }).then(response => response.entity).then(success, failure)
 
 }
 
