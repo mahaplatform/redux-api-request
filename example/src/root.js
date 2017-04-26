@@ -1,7 +1,7 @@
 import React from 'react'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
-import apiRequestMiddleware from 'redux-api-request'
+import createApiRequest from 'redux-api-request'
 import thunkMiddleware from 'redux-thunk'
 import { createLogger } from 'redux-logger'
 
@@ -14,6 +14,8 @@ class Root extends React.Component {
     super(props)
 
     const loggerMiddleware = createLogger()
+
+    const apiRequestMiddleware = createApiRequest()
 
     const createStoreWithMiddleware = applyMiddleware(
       thunkMiddleware,

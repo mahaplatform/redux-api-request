@@ -7,9 +7,9 @@ import defaultRequest from 'rest/interceptor/defaultRequest'
 import errorCode from 'rest/interceptor/errorCode'
 import * as actionTypes from './action_types'
 
-const client =  rest.wrap(params).wrap(mime).wrap(defaultRequest).wrap(errorCode)
+const defaultClient = rest.wrap(params).wrap(mime).wrap(defaultRequest).wrap(errorCode)
 
-export default store => next => action => {
+export default (client = defaultClient) => store => next => action => {
 
   const [string, namespace, type] = action.type.match(/([\a-z0-9_\.]*)?\/?([A-Z0-9_]*)/)
 
