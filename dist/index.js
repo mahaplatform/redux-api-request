@@ -48,12 +48,13 @@ var defaultClient = _rest2.default.wrap(_params2.default).wrap(_mime2.default).w
 
 exports.default = function () {
   var client = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultClient;
+
+
   return function (store) {
     return function (next) {
       return function (action) {
         var _action$type$match = action.type.match(/([\a-z0-9_\.]*)?\/?([A-Z0-9_]*)/),
             _action$type$match2 = _slicedToArray(_action$type$match, 3),
-            string = _action$type$match2[0],
             namespace = _action$type$match2[1],
             type = _action$type$match2[2];
 
