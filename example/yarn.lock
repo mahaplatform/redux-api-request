@@ -2624,12 +2624,14 @@ readdirp@^2.0.0:
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
 
-redux-api-request@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/redux-api-request/-/redux-api-request-0.0.2.tgz#4fce7376e5fa3bab19de35795222f8aa581a5cbf"
+redux-api-request@latest:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/redux-api-request/-/redux-api-request-1.0.1.tgz#3afa79b7d1a9efa1e84f130abeaa2974aba47d80"
   dependencies:
+    babel-preset-react "^6.24.1"
     lodash "^4.17.4"
     qs "^6.4.0"
+    rest "^2.0.0"
 
 redux-logger@^3.0.1:
   version "3.0.1"
@@ -2761,6 +2763,10 @@ require-main-filename@^1.0.1:
 resolve-pathname@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/resolve-pathname/-/resolve-pathname-2.1.0.tgz#e8358801b86b83b17560d4e3c382d7aef2100944"
+
+rest@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/rest/-/rest-2.0.0.tgz#6dfadf66a405c49cfbd5b4bd25b59fd29cd861bc"
 
 right-align@^0.1.1:
   version "0.1.3"
