@@ -32,9 +32,6 @@
     "delete"
   ],
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/mahaplatform/redux-api-request/issues"
-  },
   "homepage": "https://github.com/mahaplatform/redux-api-request#readme",
   "dependencies": {
     "babel-preset-react": "^6.24.1",
