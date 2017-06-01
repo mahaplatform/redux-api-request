@@ -74,10 +74,12 @@ exports.default = function () {
 
         var request = _lodash2.default.omitBy({ headers: headers, method: method, path: path, entity: entity }, _lodash2.default.isNil);
 
+        var cid = action.cid ? { cid: action.cid } : {};
+
         coerceArray(action.request).map(function (requestAction) {
           store.dispatch(_extends({
             type: withNamespace(namespace, requestAction)
-          }, action.meta, {
+          }, action.meta, cid, {
             request: request
           }));
         });
@@ -87,7 +89,7 @@ exports.default = function () {
           coerceArray(action.success).map(function (successAction) {
             store.dispatch(_extends({
               type: withNamespace(namespace, successAction)
-            }, action.meta, {
+            }, action.meta, cid, {
               result: json
             }));
           });
@@ -98,7 +100,7 @@ exports.default = function () {
           coerceArray(action.failure).map(function (failureAction) {
             store.dispatch(_extends({
               type: withNamespace(namespace, failureAction)
-            }, action.meta, {
+            }, action.meta, cid, {
               result: response.entity
             }));
           });

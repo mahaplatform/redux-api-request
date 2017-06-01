@@ -32,10 +32,13 @@ export default (client = defaultClient) => {
 
     const request = _.omitBy({ headers, method, path, entity }, _.isNil)
 
+    const cid = (action.cid) ? { cid: action.cid } : {}
+
     coerceArray(action.request).map(requestAction => {
       store.dispatch({
         type: withNamespace(namespace, requestAction),
         ...action.meta,
+        ...cid,
         request
       })
     })
@@ -47,6 +50,7 @@ export default (client = defaultClient) => {
         store.dispatch({
           type: withNamespace(namespace, successAction),
           ...action.meta,
+          ...cid,
           result: json
         })
       })
@@ -59,6 +63,7 @@ export default (client = defaultClient) => {
         store.dispatch({
           type: withNamespace(namespace, failureAction),
           ...action.meta,
+          ...cid,
           result: response.entity
         })
       })
