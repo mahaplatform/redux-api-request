@@ -15,13 +15,12 @@ export default (client = defaultClient) => {
 
     const [, namespace, type] = action.type.match(/([\a-z0-9_\.]*)?\/?([A-Z0-9_]*)/)
 
-    if(type !== actionTypes.API_REQUEST) {
-      return next(action)
-    }
+    if(type !== actionTypes.API_REQUEST) return next(action)
 
     const headers = {
       'Content-Type': 'application/json',
-      ...action.headers ? action.headers : {}
+      ...action.headers ? action.headers : {},
+      ...action.token ? { 'Authorization': `Bearer ${action.token}` } : {}
     }
 
     const method = action.method

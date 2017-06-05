@@ -58,13 +58,11 @@ exports.default = function () {
             namespace = _action$type$match2[1],
             type = _action$type$match2[2];
 
-        if (type !== actionTypes.API_REQUEST) {
-          return next(action);
-        }
+        if (type !== actionTypes.API_REQUEST) return next(action);
 
         var headers = _extends({
           'Content-Type': 'application/json'
-        }, action.headers ? action.headers : {});
+        }, action.headers ? action.headers : {}, action.token ? { 'Authorization': 'Bearer ' + action.token } : {});
 
         var method = action.method;
 
