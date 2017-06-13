@@ -68,9 +68,11 @@ exports.default = function () {
 
         var path = action.query && method === 'GET' ? action.endpoint + '?' + _qs2.default.stringify(action.query) : action.endpoint;
 
-        var entity = action.body && method !== 'GET' ? action.body : null;
+        var entity = action.body && method !== 'GET' ? action.body : {};
 
-        var request = _lodash2.default.omitBy({ headers: headers, method: method, path: path, entity: entity }, _lodash2.default.isNil);
+        var params = action.body || action.query;
+
+        var request = _lodash2.default.omitBy({ headers: headers, method: method, path: path, params: params }, _lodash2.default.isNil);
 
         var cid = action.cid ? { cid: action.cid } : {};
 
@@ -82,31 +84,37 @@ exports.default = function () {
           }));
         });
 
-        var success = function success(json) {
+        var success = function success(response) {
+
+          var result = response.entity;
 
           coerceArray(action.success).map(function (successAction) {
             store.dispatch(_extends({
               type: withNamespace(namespace, successAction)
             }, action.meta, cid, {
-              result: json
+              result: result
             }));
           });
+
+          if (action.onSuccess) action.onSuccess(result);
         };
 
         var failure = function failure(response) {
+
+          var result = response.entity;
 
           coerceArray(action.failure).map(function (failureAction) {
             store.dispatch(_extends({
               type: withNamespace(namespace, failureAction)
             }, action.meta, cid, {
-              result: response.entity
+              result: result
             }));
           });
+
+          if (action.onFailure) action.onFailure(result);
         };
 
-        return client({ headers: headers, method: method, path: path, entity: entity }).then(function (response) {
-          return response.entity;
-        }).then(success, failure);
+        return client({ headers: headers, method: method, path: path, entity: entity }).then(success, failure);
       };
     };
   };

@@ -27,9 +27,11 @@ export default (client = defaultClient) => {
 
     const path = (action.query && method === 'GET') ? `${action.endpoint}?${qs.stringify(action.query)}` : action.endpoint
 
-    const entity = (action.body && method !== 'GET') ? action.body : null
+    const entity = (action.body && method !== 'GET') ? action.body : {}
 
-    const request = _.omitBy({ headers, method, path, entity }, _.isNil)
+    const params = action.body || action.query
+
+    const request = _.omitBy({ headers, method, path, params }, _.isNil)
 
     const cid = (action.cid) ? { cid: action.cid } : {}
 
@@ -43,33 +45,41 @@ export default (client = defaultClient) => {
     })
 
 
-    const success = (json) => {
+    const success = (response) => {
+
+      const result = response.entity
 
       coerceArray(action.success).map(successAction => {
         store.dispatch({
           type: withNamespace(namespace, successAction),
           ...action.meta,
           ...cid,
-          result: json
+          result
         })
       })
+
+      if(action.onSuccess) action.onSuccess(result)
 
     }
 
     const failure = (response) => {
+
+      const result = response.entity
 
       coerceArray(action.failure).map(failureAction => {
         store.dispatch({
           type: withNamespace(namespace, failureAction),
           ...action.meta,
           ...cid,
-          result: response.entity
+          result
         })
       })
 
+      if(action.onFailure) action.onFailure(result)
+
     }
 
-    return client({ headers, method, path, entity }).then(response => response.entity).then(success, failure)
+    return client({ headers, method, path, entity }).then(success, failure)
 
   }
 
