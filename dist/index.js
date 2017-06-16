@@ -64,7 +64,7 @@ exports.default = function () {
           'Content-Type': 'application/json'
         }, action.headers ? action.headers : {}, action.token ? { 'Authorization': 'Bearer ' + action.token } : {});
 
-        var method = action.method;
+        var method = action.method ? action.method.toUpperCase() : 'GET';
 
         var path = action.query && method === 'GET' ? action.endpoint + '?' + _qs2.default.stringify(action.query) : action.endpoint;
 
@@ -102,6 +102,10 @@ exports.default = function () {
         var failure = function failure(response) {
 
           var result = response.entity;
+
+          if (response.status.code === 401) store.dispatch({ type: 'API_UNAUTHENTICATED' });
+
+          if (response.status.code === 403) store.dispatch({ type: 'API_UNAUTHORIZED' });
 
           coerceArray(action.failure).map(function (failureAction) {
             store.dispatch(_extends({

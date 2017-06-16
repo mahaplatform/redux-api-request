@@ -23,7 +23,7 @@ export default (client = defaultClient) => {
       ...action.token ? { 'Authorization': `Bearer ${action.token}` } : {}
     }
 
-    const method = action.method
+    const method = action.method ? action.method.toUpperCase() : 'GET'
 
     const path = (action.query && method === 'GET') ? `${action.endpoint}?${qs.stringify(action.query)}` : action.endpoint
 
@@ -65,6 +65,10 @@ export default (client = defaultClient) => {
     const failure = (response) => {
 
       const result = response.entity
+
+      if(response.status.code === 401) store.dispatch({ type: 'API_UNAUTHENTICATED' })
+
+      if(response.status.code === 403) store.dispatch({ type: 'API_UNAUTHORIZED' })
 
       coerceArray(action.failure).map(failureAction => {
         store.dispatch({
