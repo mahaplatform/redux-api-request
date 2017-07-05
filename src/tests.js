@@ -34,23 +34,27 @@ describe('api middleware', () => {
 
 })
 
-const mockRest = (options) => {
-  return ({
-    then: (fn) => ({
-      then: (success, failure) => {
+const mockRest = (options) => ({
+  then: (success, failure) => {
 
-        const response = {
-          entity: {}
-        }
+    const response = {
+      status: {
+        code: 500
+      }
+    }
 
-        if(options.path == '/failure') return failure(response)
-
-        success(response)
-
+    if(options.path == '/failure') return failure({
+      status: {
+        code: 500
       }
     })
-  })
-}
+
+    success({
+      entity: {}
+    })
+
+  }
+})
 
 const dispatchSingleAction = (type, done) => {
 
