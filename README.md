@@ -52,3 +52,9 @@ export const signin = (email, password) => ({
 ```
 
 [View example app](https://github.com/mahaplatform/redux-api-request/tree/master/example)
+
+## Author & Credits
+
+redux-api-request was originally written by [Greg Kops](https://github.com/mochini) and
+is based upon his work with [Think Topography](http://thinktopography.com) and
+[The Cornell Cooperative Extension of Tompkins County](http://ccetompkins.org)
