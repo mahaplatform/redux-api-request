@@ -50,3 +50,5 @@ export const signin = (email, password) => ({
   failure: SIGNIN_FAILURE
 })
 ```
+
+[View example app](https://github.com/mahaplatform/redux-api-request/tree/master/example)
