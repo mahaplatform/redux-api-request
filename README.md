@@ -23,14 +23,28 @@ npm install --save redux-api-request
 Using redux-api-request in your application is easy:
 
 ```javascript
-import { API_REQUEST } from 'redux-api-request/action_types'
+# install middleware
+import createApiRequest from 'redux-api-request'
+import thunkMiddleware from 'redux-thunk'
+import reducer from './reducer'
+
+const apiRequestMiddleware = createApiRequest()
+
+const createStoreWithMiddleware = applyMiddleware(
+  thunkMiddleware,
+  apiRequestMiddleware
+)(createStore)
+
+const store = createStoreWithMiddleware(reducer)
 
 # action creator
+import { API_REQUEST } from 'redux-api-request/action_types'
+
 export const signin = (email, password) => ({
   type: API_REQUEST,
   method: 'POST',
   endpoint: '/admin/signin',
-  params: { email, password },
+  body: { email, password },
   request: SIGNIN_REQUEST,
   success: SIGNIN_SUCCESS,
   failure: SIGNIN_FAILURE
