@@ -54,19 +54,23 @@ describe('api middleware', function () {
 
 var mockRest = function mockRest(options) {
   return {
-    then: function then(fn) {
-      return {
-        then: function then(success, failure) {
+    then: function then(success, failure) {
 
-          var response = {
-            entity: {}
-          };
-
-          if (options.path == '/failure') return failure(response);
-
-          success(response);
+      var response = {
+        status: {
+          code: 500
         }
       };
+
+      if (options.path == '/failure') return failure({
+        status: {
+          code: 500
+        }
+      });
+
+      success({
+        entity: {}
+      });
     }
   };
 };

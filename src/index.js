@@ -17,6 +17,8 @@ export default (client = defaultClient) => {
 
     if(type !== actionTypes.API_REQUEST) return next(action)
 
+    const request_id = _.random(100000, 999999).toString(36)
+
     const headers = {
       'Content-Type': 'application/json',
       ...action.headers ? action.headers : {},
@@ -40,6 +42,7 @@ export default (client = defaultClient) => {
         type: withNamespace(namespace, requestAction),
         ...action.meta,
         ...cid,
+        request_id,
         request
       })
     })
@@ -54,6 +57,7 @@ export default (client = defaultClient) => {
           type: withNamespace(namespace, successAction),
           ...action.meta,
           ...cid,
+          request_id,
           result
         })
       })
@@ -75,6 +79,7 @@ export default (client = defaultClient) => {
           type: withNamespace(namespace, failureAction),
           ...action.meta,
           ...cid,
+          request_id,
           result
         })
       })
