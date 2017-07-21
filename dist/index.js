@@ -58,91 +58,76 @@ exports.default = function () {
             namespace = _action$type$match2[1],
             type = _action$type$match2[2];
 
-        if (type === actionTypes.API_REQUEST) makeRequest(client, store, action, namespace);
+        if (type !== actionTypes.API_REQUEST) return next(action);
 
-        if (type === actionTypes.CANCEL_API_REQUEST) return cancelRequest(client, store, action, namespace);
+        var request_id = _lodash2.default.random(100000, 999999).toString(36);
 
-        return next(action);
+        var headers = _extends({
+          'Content-Type': 'application/json'
+        }, action.headers ? action.headers : {}, action.token ? { 'Authorization': 'Bearer ' + action.token } : {});
+
+        var method = action.method ? action.method.toUpperCase() : 'GET';
+
+        var path = action.query && method === 'GET' ? action.endpoint + '?' + _qs2.default.stringify(action.query) : action.endpoint;
+
+        var entity = action.body && method !== 'GET' ? action.body : {};
+
+        var params = action.body || action.query;
+
+        var request = _lodash2.default.omitBy({ headers: headers, method: method, path: path, params: params }, _lodash2.default.isNil);
+
+        var cid = action.cid ? { cid: action.cid } : {};
+
+        coerceArray(action.request).map(function (requestAction) {
+          store.dispatch(_extends({
+            type: withNamespace(namespace, requestAction)
+          }, action.meta, cid, {
+            request_id: request_id,
+            request: request
+          }));
+        });
+
+        var success = function success(response) {
+
+          var result = response.entity;
+
+          coerceArray(action.success).map(function (successAction) {
+            store.dispatch(_extends({
+              type: withNamespace(namespace, successAction)
+            }, action.meta, cid, {
+              request_id: request_id,
+              result: result
+            }));
+          });
+
+          if (action.onSuccess) action.onSuccess(result);
+        };
+
+        var failure = function failure(response) {
+
+          var result = response.entity;
+
+          if (response.status.code === 401) store.dispatch({ type: 'API_UNAUTHENTICATED' });
+
+          if (response.status.code === 403) store.dispatch({ type: 'API_UNAUTHORIZED' });
+
+          coerceArray(action.failure).map(function (failureAction) {
+            store.dispatch(_extends({
+              type: withNamespace(namespace, failureAction)
+            }, action.meta, cid, {
+              request_id: request_id,
+              result: result
+            }));
+          });
+
+          if (action.onFailure) action.onFailure(result);
+        };
+
+        return client({ headers: headers, method: method, path: path, entity: entity }).then(success, failure);
       };
     };
   };
 };
-
-var makeRequest = function makeRequest(client, store, action, namespace) {
-
-  var request_id = _lodash2.default.random(100000, 999999).toString(36);
-
-  var headers = _extends({
-    'Content-Type': 'application/json'
-  }, action.headers ? action.headers : {}, action.token ? { 'Authorization': 'Bearer ' + action.token } : {});
-
-  var method = action.method ? action.method.toUpperCase() : 'GET';
-
-  var path = action.query && method === 'GET' ? action.endpoint + '?' + _qs2.default.stringify(action.query) : action.endpoint;
-
-  var entity = action.body && method !== 'GET' ? action.body : {};
-
-  var params = action.body || action.query;
-
-  var request = _lodash2.default.omitBy({ headers: headers, method: method, path: path, params: params }, _lodash2.default.isNil);
-
-  var cid = action.cid ? { cid: action.cid } : {};
-
-  coerceArray(action.request).map(function (requestAction) {
-    store.dispatch(_extends({
-      type: withNamespace(namespace, requestAction)
-    }, action.meta, cid, {
-      request_id: request_id,
-      request: request
-    }));
-  });
-
-  var success = function success(response) {
-
-    var result = response.entity;
-
-    coerceArray(action.success).map(function (successAction) {
-      store.dispatch(_extends({
-        type: withNamespace(namespace, successAction)
-      }, action.meta, cid, {
-        request_id: request_id,
-        result: result
-      }));
-    });
-
-    if (action.onSuccess) action.onSuccess(result);
-  };
-
-  var failure = function failure(response) {
-
-    var result = response.entity;
-
-    if (response.status.code === 401) store.dispatch({ type: 'API_UNAUTHENTICATED' });
-
-    if (response.status.code === 403) store.dispatch({ type: 'API_UNAUTHORIZED' });
-
-    coerceArray(action.failure).map(function (failureAction) {
-      store.dispatch(_extends({
-        type: withNamespace(namespace, failureAction)
-      }, action.meta, cid, {
-        request_id: request_id,
-        result: result
-      }));
-    });
-
-    if (action.onFailure) action.onFailure(result);
-  };
-
-  var clientRequest = client({ headers: headers, method: method, path: path, entity: entity });
-
-  clientRequest.then(success, failure);
-
-  clientRequest.cancel();
-
-  console.log(clientRequest);
-};
-
-var cancelRequest = function cancelRequest(client, store, action, namespace) {};
 
 var coerceArray = function coerceArray(value) {
   return value ? !_lodash2.default.isArray(value) ? [value] : value : [];
