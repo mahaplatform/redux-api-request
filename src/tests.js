@@ -1,7 +1,43 @@
 import { expect } from 'chai'
 import apiMiddleware from './index'
 
+const mockRest = (options) => ({
+
+  then: (success, failure) => {
+
+    if(options.path == '/failure') {
+
+      return failure({
+        status: {
+          code: 500
+        }
+      })
+
+    }
+
+    success({
+      entity: {}
+    })
+
+  }
+
+})
+
+const middleware = apiMiddleware(mockRest)
+
 describe('api middleware', () => {
+
+  const successAction = {
+    type: 'foo/API_REQUEST',
+    method: 'GET',
+    endpoint: '/success'
+  }
+
+  const failureAction = {
+    type: 'foo/API_REQUEST',
+    method: 'GET',
+    endpoint: '/failure'
+  }
 
   it('allows non-api actions to pass through', (done) => {
 
@@ -19,47 +55,63 @@ describe('api middleware', () => {
 
   })
 
-  it('dispatches as single request', (done) =>  dispatchSingleAction('request', done))
+  it('dispatches as single request', (done) =>  dispatchesSingleAction(successAction, 'request', done))
 
-  it('dispatches as mulitple request', (done) =>  dispatchMultipleActions('request', done))
+  it('dispatches as mulitple request', (done) =>  dispatchesMultipleActions(successAction, 'request', done))
 
-  it('dispatches as single success', (done) =>  dispatchSingleAction('success', done))
+  it('dispatches as single success', (done) =>  dispatchesSingleAction(successAction, 'success', done))
 
-  it('dispatches as mulitple success', (done) =>  dispatchMultipleActions('success', done))
+  it('dispatches as mulitple success', (done) =>  dispatchesMultipleActions(successAction, 'success', done))
 
-  it('dispatches as single failure', (done) =>  dispatchSingleAction('failure', done))
+  it('dispatches as single failure', (done) =>  dispatchesSingleAction(failureAction, 'failure', done))
 
-  it('dispatches as mulitple failure', (done) =>  dispatchMultipleActions('failure', done))
+  it('dispatches as mulitple failure', (done) =>  dispatchesMultipleActions(failureAction, 'failure', done))
+
+  // it('request returns appropriate value', (done) => returnsAppropriateValue(successAction, 'request', { }, done))
+  //
+  // it('success returns appropriate value', (done) => returnsAppropriateValue(successAction, 'success', { }, done))
+  //
+  // it('response returns appropriate value', (done) => returnsAppropriateValue(failureAction, 'failure', { }, done))
 
 })
 
-const mockRest = (options) => ({
-  then: (success, failure) => {
+// const returnsAppropriateValue = (action, type, value, done) => {
+//
+//   const store = {
+//
+//     dispatch: (action) => {
+//
+//       if(action.type === `foo/${type.toUpperCase()}`) {
+//
+//         expect(action).to.eql({
+//           type: `foo/${type.toUpperCase()}`,
+//           ...value
+//         })
+//
+//         done()
+//
+//       }
+//
+//     }
+//
+//   }
+//
+//   const next = () => {}
+//
+//   const actionWithCallback = {
+//     ...action,
+//     [type]: `${type.toUpperCase()}`
+//   }
+//
+//   middleware(store)(next)(actionWithCallback)
+//
+// }
 
-    const response = {
-      status: {
-        code: 500
-      }
-    }
-
-    if(options.path == '/failure') return failure({
-      status: {
-        code: 500
-      }
-    })
-
-    success({
-      entity: {}
-    })
-
-  }
-})
-
-const dispatchSingleAction = (type, done) => {
+const dispatchesSingleAction = (action, actionType, done) => {
 
   const store = {
     dispatch: (action) => {
-      if(action.type === `foo/FETCH_${type.toUpperCase()}`) {
+      if(action.type === `foo/${actionType.toUpperCase()}`) {
         done()
       }
     }
@@ -67,21 +119,20 @@ const dispatchSingleAction = (type, done) => {
 
   const next = () => {}
 
-  const action = {
-    type: 'foo/API_REQUEST',
-    endpoint: `/${type}`,
-    [type]: `FETCH_${type.toUpperCase()}`
+  const actionWithCallback = {
+    ...action,
+    [actionType]: actionType.toUpperCase()
   }
 
-  apiMiddleware(mockRest)(store)(next)(action)
+  middleware(store)(next)(actionWithCallback)
 
 }
 
-const dispatchMultipleActions = (type, done) => {
+const dispatchesMultipleActions = (action, actionType, done) => {
 
   const store = {
     dispatch: (action) => {
-      if(action.type === 'foo/FETCH_${type.toUpperCase()}2') {
+      if(action.type === 'foo/${actionType.toUpperCase()}2') {
         done()
       }
     }
@@ -89,12 +140,11 @@ const dispatchMultipleActions = (type, done) => {
 
   const next = () => {}
 
-  const action = {
-    type: 'foo/API_REQUEST',
-    endpoint: `/${type}`,
-    request: ['FETCH_${type.toUpperCase()}1','FETCH_${type.toUpperCase()}2']
+  const actionWithCallback = {
+    ...action,
+    request: ['${actionType.toUpperCase()}1','${actionType.toUpperCase()}2']
   }
 
-  apiMiddleware(mockRest)(store)(next)(action)
+  middleware(store)(next)(actionWithCallback)
 
 }
