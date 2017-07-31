@@ -18,7 +18,7 @@ class Root extends React.Component {
 
     super(props)
 
-    const loggerMiddleware = createLogger()
+    const loggerMiddleware = createLogger({ collapsed: true })
 
     const apiRequestMiddleware = createApiRequest()
 
