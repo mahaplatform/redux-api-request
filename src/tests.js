@@ -1,4 +1,3 @@
-
 import { expect } from 'chai'
 import apiMiddleware from './index'
 
