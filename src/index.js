@@ -9,7 +9,7 @@ import * as actionTypes from './action_types'
 
 const defaultClient = rest.wrap(params).wrap(mime).wrap(defaultRequest).wrap(errorCode)
 
-export default (options) => {
+export default (options = {}) => {
 
   const client = options.client || defaultClient
 
@@ -31,7 +31,7 @@ export default (options) => {
 
     const method = action.method ? action.method.toUpperCase() : 'GET'
 
-    const endpoint = `${defaultHost}${action.endpoint}`
+    const endpoint = action.endpoint.substr(0,4) !== 'http' ? `${defaultHost}${action.endpoint}` : action.endpoint
 
     const path = (action.query && method === 'GET') ? `${endpoint}?${qs.stringify(action.query)}` : endpoint
 

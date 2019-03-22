@@ -47,8 +47,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var defaultClient = _rest2.default.wrap(_params2.default).wrap(_mime2.default).wrap(_defaultRequest2.default).wrap(_errorCode2.default);
 
 exports.default = function () {
-  var client = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultClient;
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
+
+  var client = options.client || defaultClient;
+
+  var defaultHost = options.defaultHost || '';
 
   return function (store) {
     return function (next) {
@@ -68,7 +72,9 @@ exports.default = function () {
 
         var method = action.method ? action.method.toUpperCase() : 'GET';
 
-        var path = action.query && method === 'GET' ? action.endpoint + '?' + _qs2.default.stringify(action.query) : action.endpoint;
+        var endpoint = action.endpoint.substr(0, 4) !== 'http' ? '' + defaultHost + action.endpoint : action.endpoint;
+
+        var path = action.query && method === 'GET' ? endpoint + '?' + _qs2.default.stringify(action.query) : endpoint;
 
         var entity = action.body && method !== 'GET' ? action.body : {};
 
