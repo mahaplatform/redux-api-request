@@ -1,6 +1,11 @@
-'use strict';
-
+"use strict";
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
-var API_REQUEST = exports.API_REQUEST = 'API_REQUEST';
+Object.defineProperty(exports, "API_REQUEST", {
+    enumerable: true,
+    get: function() {
+        return API_REQUEST;
+    }
+});
+var API_REQUEST = "API_REQUEST";
