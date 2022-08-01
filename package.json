@@ -1,6 +1,6 @@
 {
   "name": "redux-api-request",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Redux middleware for making api requests",
   "license": "ISC",
   "author": "Greg Kops <greg@thinktopography.com>",

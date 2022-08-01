@@ -205,6 +205,19 @@ var _default = function() {
                 };
                 var failure = function(error) {
                     var result = error.response.data;
+                    if (result.status === 401 && result.message === "Expired Token") {
+                        store.dispatch({
+                            type: "API_EXPIRED_TOKEN"
+                        });
+                    } else if (result.status === 401) {
+                        store.dispatch({
+                            type: "API_UNAUTHENTICATED"
+                        });
+                    } else if (result.status === 403) {
+                        store.dispatch({
+                            type: "API_UNAUTHORIZED"
+                        });
+                    }
                     coerceArray(action.failure).map(function(failureAction) {
                         store.dispatch(_objectSpreadProps(_objectSpread({
                             type: withNamespace(namespace, failureAction)
